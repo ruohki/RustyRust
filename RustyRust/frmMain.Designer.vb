@@ -24,10 +24,10 @@ Partial Class frmMain
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmMain))
-        Dim TreeNode5 As System.Windows.Forms.TreeNode = New System.Windows.Forms.TreeNode("blink.ino")
-        Dim TreeNode6 As System.Windows.Forms.TreeNode = New System.Windows.Forms.TreeNode("Blink.inoprj", New System.Windows.Forms.TreeNode() {TreeNode5})
-        Dim TreeNode7 As System.Windows.Forms.TreeNode = New System.Windows.Forms.TreeNode("arduino.h")
-        Dim TreeNode8 As System.Windows.Forms.TreeNode = New System.Windows.Forms.TreeNode("Not Part of Project", New System.Windows.Forms.TreeNode() {TreeNode7})
+        Dim TreeNode1 As System.Windows.Forms.TreeNode = New System.Windows.Forms.TreeNode("blink.ino")
+        Dim TreeNode2 As System.Windows.Forms.TreeNode = New System.Windows.Forms.TreeNode("Blink.inoprj", New System.Windows.Forms.TreeNode() {TreeNode1})
+        Dim TreeNode3 As System.Windows.Forms.TreeNode = New System.Windows.Forms.TreeNode("arduino.h")
+        Dim TreeNode4 As System.Windows.Forms.TreeNode = New System.Windows.Forms.TreeNode("Not Part of Project", New System.Windows.Forms.TreeNode() {TreeNode3})
         Me.DateiToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.NeuToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ÖffnenToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -164,11 +164,14 @@ Partial Class frmMain
         Me.tvProjectItems = New System.Windows.Forms.TreeView()
         Me.ilTreeview = New System.Windows.Forms.ImageList(Me.components)
         Me.tsTabs = New System.Windows.Forms.TabControl()
-        Me.txtOutput = New System.Windows.Forms.TextBox()
         Me.lsMessages = New System.Windows.Forms.ListView()
-        Me.File = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
-        Me.Row = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
-        Me.Type = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
+        Me.MessageType = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
+        Me.MessageFile = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
+        Me.MessageRow = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
+        Me.MessageCol = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
+        Me.MessageMessage = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
+        Me.ilCompilerOutput = New System.Windows.Forms.ImageList(Me.components)
+        Me.txtOutput = New System.Windows.Forms.TextBox()
         Me.tsTools.SuspendLayout()
         Me.tsMenu.SuspendLayout()
         CType(Me.scSplit2, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -1124,17 +1127,17 @@ Partial Class frmMain
         Me.tvProjectItems.Location = New System.Drawing.Point(2, 25)
         Me.tvProjectItems.Margin = New System.Windows.Forms.Padding(2, 0, 0, 0)
         Me.tvProjectItems.Name = "tvProjectItems"
-        TreeNode5.ImageIndex = 5
-        TreeNode5.Name = "Knoten2"
-        TreeNode5.Text = "blink.ino"
-        TreeNode6.Name = "nodeProject"
-        TreeNode6.Text = "Blink.inoprj"
-        TreeNode7.ImageIndex = 4
-        TreeNode7.Name = "Knoten3"
-        TreeNode7.Text = "arduino.h"
-        TreeNode8.Name = "nodeNotProject"
-        TreeNode8.Text = "Not Part of Project"
-        Me.tvProjectItems.Nodes.AddRange(New System.Windows.Forms.TreeNode() {TreeNode6, TreeNode8})
+        TreeNode1.ImageIndex = 5
+        TreeNode1.Name = "Knoten2"
+        TreeNode1.Text = "blink.ino"
+        TreeNode2.Name = "nodeProject"
+        TreeNode2.Text = "Blink.inoprj"
+        TreeNode3.ImageIndex = 4
+        TreeNode3.Name = "Knoten3"
+        TreeNode3.Text = "arduino.h"
+        TreeNode4.Name = "nodeNotProject"
+        TreeNode4.Text = "Not Part of Project"
+        Me.tvProjectItems.Nodes.AddRange(New System.Windows.Forms.TreeNode() {TreeNode2, TreeNode4})
         Me.tvProjectItems.SelectedImageIndex = 0
         Me.tvProjectItems.Size = New System.Drawing.Size(165, 256)
         Me.tvProjectItems.TabIndex = 1
@@ -1160,6 +1163,53 @@ Partial Class frmMain
         Me.tsTabs.Size = New System.Drawing.Size(640, 281)
         Me.tsTabs.TabIndex = 0
         '
+        'lsMessages
+        '
+        Me.lsMessages.BackColor = System.Drawing.Color.White
+        Me.lsMessages.Columns.AddRange(New System.Windows.Forms.ColumnHeader() {Me.MessageType, Me.MessageFile, Me.MessageRow, Me.MessageCol, Me.MessageMessage})
+        Me.lsMessages.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.lsMessages.ForeColor = System.Drawing.Color.FromArgb(CType(CType(77, Byte), Integer), CType(CType(77, Byte), Integer), CType(CType(77, Byte), Integer))
+        Me.lsMessages.FullRowSelect = True
+        Me.lsMessages.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None
+        Me.lsMessages.Location = New System.Drawing.Point(0, 0)
+        Me.lsMessages.Name = "lsMessages"
+        Me.lsMessages.Size = New System.Drawing.Size(640, 78)
+        Me.lsMessages.SmallImageList = Me.ilCompilerOutput
+        Me.lsMessages.TabIndex = 1
+        Me.lsMessages.UseCompatibleStateImageBehavior = False
+        Me.lsMessages.View = System.Windows.Forms.View.Details
+        '
+        'MessageType
+        '
+        Me.MessageType.Width = 70
+        '
+        'MessageFile
+        '
+        Me.MessageFile.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        Me.MessageFile.Width = 100
+        '
+        'MessageRow
+        '
+        Me.MessageRow.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        Me.MessageRow.Width = 30
+        '
+        'MessageCol
+        '
+        Me.MessageCol.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        Me.MessageCol.Width = 30
+        '
+        'MessageMessage
+        '
+        Me.MessageMessage.Width = 240
+        '
+        'ilCompilerOutput
+        '
+        Me.ilCompilerOutput.ImageStream = CType(resources.GetObject("ilCompilerOutput.ImageStream"), System.Windows.Forms.ImageListStreamer)
+        Me.ilCompilerOutput.TransparentColor = System.Drawing.Color.Transparent
+        Me.ilCompilerOutput.Images.SetKeyName(0, "error")
+        Me.ilCompilerOutput.Images.SetKeyName(1, "information")
+        Me.ilCompilerOutput.Images.SetKeyName(2, "warning")
+        '
         'txtOutput
         '
         Me.txtOutput.BackColor = System.Drawing.Color.Black
@@ -1171,21 +1221,6 @@ Partial Class frmMain
         Me.txtOutput.Name = "txtOutput"
         Me.txtOutput.Size = New System.Drawing.Size(640, 78)
         Me.txtOutput.TabIndex = 0
-        '
-        'lsMessages
-        '
-        Me.lsMessages.BackColor = System.Drawing.Color.White
-        Me.lsMessages.Columns.AddRange(New System.Windows.Forms.ColumnHeader() {Me.File, Me.Row, Me.Type})
-        Me.lsMessages.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.lsMessages.ForeColor = System.Drawing.Color.FromArgb(CType(CType(77, Byte), Integer), CType(CType(77, Byte), Integer), CType(CType(77, Byte), Integer))
-        Me.lsMessages.FullRowSelect = True
-        Me.lsMessages.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None
-        Me.lsMessages.Location = New System.Drawing.Point(0, 0)
-        Me.lsMessages.Name = "lsMessages"
-        Me.lsMessages.Size = New System.Drawing.Size(640, 78)
-        Me.lsMessages.TabIndex = 1
-        Me.lsMessages.UseCompatibleStateImageBehavior = False
-        Me.lsMessages.View = System.Windows.Forms.View.Details
         '
         'frmMain
         '
@@ -1359,10 +1394,13 @@ Partial Class frmMain
     Friend WithEvents DummyitemToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ToolStripSeparator5 As System.Windows.Forms.ToolStripSeparator
     Friend WithEvents btnBuildRun As System.Windows.Forms.ToolStripButton
-    Friend WithEvents File As System.Windows.Forms.ColumnHeader
-    Friend WithEvents Row As System.Windows.Forms.ColumnHeader
-    Friend WithEvents Type As System.Windows.Forms.ColumnHeader
+    Friend WithEvents MessageType As System.Windows.Forms.ColumnHeader
+    Friend WithEvents MessageFile As System.Windows.Forms.ColumnHeader
     Friend WithEvents lsMessages As System.Windows.Forms.ListView
+    Public WithEvents MessageRow As System.Windows.Forms.ColumnHeader
+    Friend WithEvents MessageCol As System.Windows.Forms.ColumnHeader
+    Friend WithEvents MessageMessage As System.Windows.Forms.ColumnHeader
+    Friend WithEvents ilCompilerOutput As System.Windows.Forms.ImageList
 
 
 

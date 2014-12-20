@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
@@ -13,7 +13,7 @@
     <AssemblyName>RustyRust</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MyType>WindowsForms</MyType>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
     <IsWebBootstrapper>false</IsWebBootstrapper>
@@ -41,6 +41,7 @@
     <OutputPath>bin\Debug\</OutputPath>
     <DocumentationFile>RustyRust.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -51,6 +52,7 @@
     <OutputPath>bin\Release\</OutputPath>
     <DocumentationFile>RustyRust.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
     <OptionExplicit>On</OptionExplicit>
@@ -71,7 +73,7 @@
     <ApplicationIcon>Rust.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="FastColoredTextBox, Version=2.12.2.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="FastColoredTextBox, Version=2.16.2.0, Culture=neutral, PublicKeyToken=fb8aa12b994ef61b, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>bin\FastColoredTextBox.dll</HintPath>
     </Reference>
@@ -165,7 +167,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Arduino for Windows.ico" />
     <Content Include="bin\FastColoredTextBox.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -225,7 +226,12 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\RustCompilerWrapper\RustCompilerWrapper.vbproj">
+      <Project>{5ec06cac-3d31-4ac5-9fc7-089a909d3947}</Project>
+      <Name>RustCompilerWrapper</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

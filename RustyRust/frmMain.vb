@@ -6,6 +6,8 @@ Imports System.Drawing
 Imports System.Threading
 Imports System.Text
 
+Imports RustCompilerWrapper
+
 Public Class frmMain
     Dim KeywordStyle As TextStyle = New TextStyle(New SolidBrush(Color.FromArgb(137, 89, 168)), Nothing, FontStyle.Regular)
     Dim ConstantStyle As TextStyle = New TextStyle(New SolidBrush(Color.FromArgb(245, 135, 31)), Nothing, FontStyle.Regular)
@@ -51,6 +53,13 @@ Public Class frmMain
 
         scSplit2.Size = New Size(Me.ClientSize.Width, Me.ClientSize.Height - tsMenu.Height - tsTools.Height - tsStatus.Height)
 
+        Dim ColLeft As UInteger
+
+        For i = 0 To lsMessages.Columns.Count - 2
+            ColLeft += lsMessages.Columns(i).Width
+        Next
+
+        lsMessages.Columns(lsMessages.Columns.Count - 1).Width = lsMessages.Width - ColLeft - 24
     End Sub
 
     Private Sub frmMain_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
@@ -272,70 +281,43 @@ Public Class frmMain
         myDoc.Changed = True
 
 
-        sender.LeftBracket = "("
-        sender.RightBracket = ")"
-        sender.LeftBracket2 = "\x0"
-        sender.RightBracket2 = "\x0"
-        'clear style of changed range
-        sender.Range.ClearStyle(KeywordStyle, ConstantStyle, CommentStyle, OperatorStyle, StringStyle, NumberStyle, HyperlinkStyle)
+        With sender
+            .LeftBracket = "("
+            .RightBracket = ")"
+            .LeftBracket2 = "\x0"
+            .RightBracket2 = "\x0"
 
-        'hyperlinks
-        sender.Range.SetStyle(HyperlinkStyle, "(http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&amp;:/~\+#]*[\w\-\@?^=%&amp;/~\+#])?")
+            'clear style of changed range
+            .Range.ClearStyle(KeywordStyle, ConstantStyle, CommentStyle, OperatorStyle, StringStyle, NumberStyle, HyperlinkStyle)
 
+            'hyperlinks
+            .Range.SetStyle(HyperlinkStyle, "(http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&amp;:/~\+#]*[\w\-\@?^=%&amp;/~\+#])?")
 
-        'comment highlighting
-        sender.Range.SetStyle(CommentStyle, "//.*$", RegexOptions.Multiline)
-        sender.Range.SetStyle(CommentStyle, "(/\*.*?\*/)|(/\*.*)", RegexOptions.Singleline)
-        sender.Range.SetStyle(CommentStyle, "(/\*.*?\*/)|(.*\*/)", RegexOptions.Singleline Or RegexOptions.RightToLeft)
+            '/* somecomments */
+            .Range.SetStyle(CommentStyle, "//.*$", RegexOptions.Multiline)
+            .Range.SetStyle(CommentStyle, "/\*(?>(?:(?>[^*]+)|\*(?!/))*)\*/", RegexOptions.Multiline)
+            '//somecomment
 
+            'Escape Chars
+            .Range.SetStyle(CommentStyle, "\\(x\\h{2}|[0-2][0-7]{,2}|3[0-6][0-7]?|37[0-7]?|[4-7][0-7]?|.)")
 
-        'function
-        sender.Range.SetStyle(KeywordStyle, "\b(fn)(\s+)([a-zA-Z_][a-zA-Z0-9_][\w\:,+ \'<>]*)(\s*\()")
-        'token: "keyword.source.rust",
-        sender.Range.SetStyle(KeywordStyle, "\b(?:as|assert|break|claim|const|copy|Copy|do|drop|else|extern|fail|for|if|impl|in|let|log|loop|match|mod|module|move|mut|Owned|priv|pub|pure|ref|return|unchecked|unsafe|use|while|mod|Send|static|trait|class|struct|enum|type)\b")
+            'sigils
+            .range.SetStyle(KeywordStyle, "[&*](?=[a-zA-Z0-9_\(\[\|\""]+)")
 
-        'string highlighting
-        sender.Range.SetStyle(StringStyle, """.+?""")
-        sender.Range.SetStyle(StringStyle, "(\"".*?\"")|(\"".*)", RegexOptions.Singleline)
-        sender.Range.SetStyle(StringStyle, "(\"".*?\"")|(.*\"")", RegexOptions.Singleline Or RegexOptions.RightToLeft)
-        'Keywords1 Arduino
-        '
-        'token: "variable.other.source.rust",
-        sender.range.setstyle(StringStyle, "'[a-zA-Z_][a-zA-Z0-9_]*'")
-        'token: "storage.type.source.rust",
-        sender.Range.SetStyle(KeywordStyle, "\b(?:Self|m32|m64|m128|f80|f16|f128|int|uint|float|char|bool|u8|u16|u32|u64|f32|f64|i8|i16|i32|i64|str|option|either|c_float|c_double|c_void|FILE|fpos_t|DIR|dirent|c_char|c_schar|c_uchar|c_short|c_ushort|c_int|c_uint|c_long|c_ulong|size_t|ptrdiff_t|clock_t|time_t|c_longlong|c_ulonglong|intptr_t|uintptr_t|off_t|dev_t|ino_t|pid_t|mode_t|ssize_t)\b")
-        'token: "keyword.operator",
-        sender.Range.SetStyle(OperatorStyle, "/!|\$|\*|\-\-|\-|\+\+|\+|-->|===|==|=|!=|!==|<=|>=|<<=|>>=|>>>=|<>|<|>|!|&&|\|\||\?\:|\*=|/=|%=|\+=|\-=|&=|\^=|,|;")
-        'token: "support.constant",
-        sender.range.setstyle(ConstantStyle, "\b[a-zA-Z_][\w\d]*::")
-        'token: "variable.language.source.rust",
-        sender.range.setstyle(ConstantStyle, "\bself\b")
-        'token: "support.constant.source.rust",
-        sender.range.setstyle(ConstantStyle, "\b(?:EXIT_FAILURE|EXIT_SUCCESS|RAND_MAX|EOF|SEEK_SET|SEEK_CUR|SEEK_END|_IOFBF|_IONBF|_IOLBF|BUFSIZ|FOPEN_MAX|FILENAME_MAX|L_tmpnam|TMP_MAX|O_RDONLY|O_WRONLY|O_RDWR|O_APPEND|O_CREAT|O_EXCL|O_TRUNC|S_IFIFO|S_IFCHR|S_IFBLK|S_IFDIR|S_IFREG|S_IFMT|S_IEXEC|S_IWRITE|S_IREAD|S_IRWXU|S_IXUSR|S_IWUSR|S_IRUSR|F_OK|R_OK|W_OK|X_OK|STDIN_FILENO|STDOUT_FILENO|STDERR_FILENO)\b")
-        'token: "meta.preprocessor.source.rust",
-        sender.range.setstyle(OperatorStyle, "\b\w\(\w\)*!|#\[[\w=\(\)_]+\]\b")
-        'token: "constant.language.source.rust",
-        sender.range.setstyle(ConstantStyle, "\b(?:true|false|Some|None|Left|Right|Ok|Err)\b")
-        'token: "constant.numeric.integer.source.rust",
-        sender.range.setstyle(NumberStyle, "\b(?:[0-9][0-9_]*|[0-9][0-9_]*(?:u|u8|u16|u32|u64)|[0-9][0-9_]*(?:i|i8|i16|i32|i64))\b")
-        'token: "constant.numeric.hex.source.rust",
-        sender.range.setstyle(NumberStyle, "\b(?:0x[a-fA-F0-9_]+|0x[a-fA-F0-9_]+(?:u|u8|u16|u32|u64)|0x[a-fA-F0-9_]+(?:i|i8|i16|i32|i64))\b")
-        'token: "constant.numeric.binary.source.rust",
-        sender.range.setstyle(NumberStyle, "\b(?:0b[01_]+|0b[01_]+(?:u|u8|u16|u32|u64)|0b[01_]+(?:i|i8|i16|i32|i64))\b")
-        'token: "constant.numeric.float.source.rust",
-        sender.range.setstyle(NumberStyle, "[0-9][0-9_]*(?:f32|f64|f)|[0-9][0-9_]*[eE][+-]=[0-9_]+|[0-9][0-9_]*[eE][+-]=[0-9_]+(?:f32|f64|f)|[0-9][0-9_]*\.[0-9_]+|[0-9][0-9_]*\.[0-9_]+(?:f32|f64|f)|[0-9][0-9_]*\.[0-9_]+%[eE][+-]=[0-9_]+|[0-9][0-9_]*\.[0-9_]+%[eE][+-]=[0-9_]+(?:f32|f64|f)")
-        'token: "constant.character.escape.source.rust",
-        sender.range.setstyle(CommentStyle, "\\(?:x[\da-fA-F]{2}|[0-2][0-7]{,2}|3[0-6][0-7]?|37[0-7]?|[4-7][0-7]?|.)")
+            'raw string litertal
+            .range.Setstyle(StringStyle, "r(#*)"".*?""(\1)")
+            .Range.SetStyle(StringStyle, """(?>(?:(?>[^*]+)|""(?!))*)""", RegexOptions.Multiline)
 
-        'clear folding markers
-        sender.Range.ClearFoldingMarkers()
-        'set folding markers
-        'start: /(\{|\[)[^\}\]]*$|^\s*(\/\*)/
-        'ende: /^[^\[\{]*(\}|\])|^[\s\*]*(\*\/)/
-        sender.Range.SetFoldingMarkers("{", "}") 'allow to collapse brackets block
-        sender.Range.SetFoldingMarkers("\[", "\]") 'allow to collapse brackets block
-        'sender.Range.SetFoldingMarkers("(", ")") 'allow to collapse brackets block
-        sender.Range.SetFoldingMarkers("/\*", "\*/") 'allow to collapse comment block
+            'clear folding markers
+            .Range.ClearFoldingMarkers()
+            'set folding markers
+            'start: /(\{|\[)[^\}\]]*$|^\s*(\/\*)/
+            'ende: /^[^\[\{]*(\}|\])|^[\s\*]*(\*\/)/
+            .Range.SetFoldingMarkers("{", "}") 'allow to collapse brackets block
+            .Range.SetFoldingMarkers("\[", "\]") 'allow to collapse brackets block
+            'sender.Range.SetFoldingMarkers("(", ")") 'allow to collapse brackets block
+            .Range.SetFoldingMarkers("/\*", "\*/") 'allow to collapse comment block
+        End With
 
 
     End Sub
@@ -352,12 +334,14 @@ Public Class frmMain
     End Function
 
     Private Sub Editor_MouseMove(ByVal sender As Object, ByVal e As MouseEventArgs)
-        Dim p = sender.PointToPlace(e.Location)
-        If CharIsHyperlink(sender, p) Then
-            sender.Cursor = Cursors.Hand
-        Else
-            sender.Cursor = Cursors.IBeam
-        End If
+        'Dim p = sender.PointToPlace(e.Location)
+
+        'If CharIsHyperlink(sender, p) Then
+        '    sender.Cursor = Cursors.Hand
+        'Else : e()
+
+        'sender.Cursor = Cursors.IBeam
+        'End If
     End Sub
 
     Private Sub Editor_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs)
@@ -535,7 +519,9 @@ Public Class frmMain
     End Sub
 
     Private Sub btnBuildRun_Click(sender As Object, e As EventArgs) Handles btnBuildRun.Click
-        Dim PATH As String = Environment.GetEnvironmentVariable("")
+        Dim compileWrapper As New CompilerWrapper
+        Dim compilerOutput As CompilerWrapper.SCompilerOutput
+
         Dim myProcess As Process = New Process()
 
 
@@ -546,48 +532,51 @@ Public Class frmMain
         Catch
         End Try
 
-        Try
-            myDoc = tsTabs.SelectedTab.Tag
-            SaveFile(myDoc)
 
-            bCompileError = False
+        myDoc = tsTabs.SelectedTab.Tag
+        SaveFile(myDoc)
 
-            With myProcess.StartInfo
+        compilerOutput = compileWrapper.Compile(myDoc.FileInfo.DirectoryName & "\" & myDoc.FileInfo.Name)
+
+        lsMessages.Items.Clear()
+        For Each myMessage As CompilerWrapper.SCompilerMessage In compilerOutput.Messages
+            Dim myItem As New ListViewItem
+
+            Select Case myMessage.MessageType
+                Case CompilerWrapper.SCompilerMessage.ECompilerMessageType.MessageAdditional
+                Case CompilerWrapper.SCompilerMessage.ECompilerMessageType.MessageError : myItem.Text = "Error" : myItem.ForeColor = Color.Red : myItem.ImageKey = "error"
+                Case CompilerWrapper.SCompilerMessage.ECompilerMessageType.MessageWarning : myItem.Text = "Warning" : myItem.ForeColor = Color.LimeGreen : myItem.ImageKey = "warning"
+            End Select
+
+            myItem.SubItems.Add(myMessage.ProblemFile)
+            myItem.SubItems.Add(myMessage.ProblemRow)
+            myItem.SubItems.Add(myMessage.ProblemCol)
+            Dim mySecondItem = myItem.SubItems.Add(myMessage.ProblemMessage)
+            mySecondItem.Tag = myMessage.ProblemSnippet
+
+
+
+
+            lsMessages.Items.Add(myItem)
+        Next
+
+        If compilerOutput.bSuccessful = True Then
+            runProcess = New Process()
+
+            With runProcess.StartInfo
                 .UseShellExecute = False
-                .FileName = "rustc"
-                .Arguments = "-o " & myDoc.FileInfo.Name.Remove(myDoc.FileInfo.Name.Length - myDoc.FileInfo.Extension.Length) & " " & myDoc.FileInfo.Name
+                .FileName = myDoc.FileInfo.DirectoryName & "\" & compilerOutput.Executable
                 .WorkingDirectory = myDoc.FileInfo.DirectoryName & "\"
-                .RedirectStandardOutput = True
-                .RedirectStandardError = True
-                .RedirectStandardInput = True
-                .CreateNoWindow = True
                 .WindowStyle = ProcessWindowStyle.Normal
             End With
-            AddHandler myProcess.OutputDataReceived, AddressOf process_OutputDatReceived
-            AddHandler myProcess.ErrorDataReceived, AddressOf process_OutputErrReceived
-            processOutput.Clear()
 
-            myProcess.Start()
-            myProcess.BeginOutputReadLine()
-            myProcess.BeginErrorReadLine()
-            myProcess.WaitForExit()
+            runProcess.Start()
+        End If
 
-            txtOutput.Text = processOutput.ToString
 
-            If bCompileError = False Then
-                runProcess = New Process()
-
-                With runProcess.StartInfo
-                    .UseShellExecute = False
-                    .FileName = myDoc.FileInfo.FullName.Remove(myDoc.FileInfo.FullName.Length - myDoc.FileInfo.Extension.Length) & ".exe"
-                    .WorkingDirectory = myDoc.FileInfo.DirectoryName & "\"
-                    .WindowStyle = ProcessWindowStyle.Normal
-                End With
-                runProcess.Start()
-            End If
-        Catch ex As Exception
-            MessageBox.Show(ex.Message)
-        End Try
+        ' Catch ex As Exception
+        'MessageBox.Show(ex.Message)
+        'End Try
 
 
     End Sub
@@ -627,6 +616,30 @@ Public Class frmMain
     End Sub
 
     Private Sub txtOutput_TextChanged(sender As Object, e As EventArgs) Handles txtOutput.TextChanged
+
+    End Sub
+
+    Private Sub lsMessages_DoubleClick(sender As Object, e As EventArgs) Handles lsMessages.DoubleClick
+        If Not lsMessages.SelectedItems(0) Is Nothing Then
+            For Each myDoc As Document In Documents
+                Try
+                    If myDoc.FileInfo.Name.ToLower = lsMessages.SelectedItems(0).SubItems(1).Text Then
+                        myDoc.Editor.Selection.Start = New Place(lsMessages.SelectedItems(0).SubItems(3).Text - 1, lsMessages.SelectedItems(0).SubItems(2).Text - 1)  'New Range(myDoc.Editor,, lsMessages.SelectedItems(0).SubItems(2).Text, lsMessages.SelectedItems(0).SubItems(3).Text)
+                        myDoc.Editor.Selection.End = New Place(lsMessages.SelectedItems(0).SubItems(4).Tag.ToString.Length, lsMessages.SelectedItems(0).SubItems(2).Text - 1)
+
+                        myDoc.Editor.CurrentLineColor = Color.FromArgb(100, 210, 210, 255)
+                    End If
+                Catch
+                End Try
+            Next
+        End If
+    End Sub
+
+    Private Sub lsMessages_SelectedIndexChanged(sender As Object, e As EventArgs) Handles lsMessages.SelectedIndexChanged
+
+    End Sub
+
+    Private Sub btnNew_Click(sender As Object, e As EventArgs) Handles btnNew.Click
 
     End Sub
 End Class
